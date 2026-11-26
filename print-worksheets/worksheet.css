@@ -1,0 +1,324 @@
+/* Clean A4 Printable Worksheet Stylesheet — Starters 2 Final Term 1 */
+@page {
+  size: A4 portrait;
+  margin: 14mm 15mm 14mm 15mm;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+/* Screen-only Print Toolbar */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #1e293b;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+}
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tb-btn {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tb-btn:hover { background: #2563eb; }
+.tb-btn.secondary { background: #475569; }
+.tb-btn.secondary:hover { background: #334155; }
+.tb-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.12);
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+/* A4 Paper Container */
+.sheet {
+  max-width: 210mm;
+  margin: 18px auto 32px;
+  background: #ffffff;
+  padding: 16mm 16mm;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.12);
+  border-radius: 6px;
+}
+
+/* Worksheet Header */
+.ws-header {
+  border: 2px solid #0f172a;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.ws-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1.5px solid #cbd5e1;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+.ws-title-row h1 {
+  font-size: 20px;
+  color: #0f172a;
+  letter-spacing: 0.3px;
+}
+.ws-sub {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #475569;
+}
+.student-info {
+  display: grid;
+  grid-template-columns: 2fr 1.1fr 1.1fr 0.9fr;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+.info-line {
+  border-bottom: 1.5px dotted #475569;
+  display: inline-block;
+  min-width: 70px;
+}
+
+/* Sections */
+.part {
+  margin-bottom: 16px;
+  break-inside: avoid;
+}
+.part-title {
+  background: #f1f5f9;
+  border-left: 5px solid #0f172a;
+  padding: 6px 12px;
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+.part-note {
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.word-bank {
+  border: 1.5px dashed #475569;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background: #f8fafc;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+ol.q-list {
+  padding-left: 22px;
+}
+ol.q-list li {
+  margin-bottom: 8px;
+}
+.blank {
+  display: inline-block;
+  min-width: 95px;
+  border-bottom: 1.5px solid #1e293b;
+  margin: 0 3px;
+}
+.blank.short { min-width: 55px; }
+.blank.long { min-width: 155px; }
+
+.opts-inline {
+  margin-left: 6px;
+  font-weight: 600;
+}
+.tf-box {
+  float: right;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+/* Grids */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px 16px;
+}
+
+/* Matching Table */
+table.match-tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+}
+table.match-tbl th,
+table.match-tbl td {
+  border: 1.5px solid #94a3b8;
+  padding: 7px 10px;
+  text-align: left;
+  font-size: 14px;
+}
+table.match-tbl th {
+  background: #f1f5f9;
+  font-weight: 800;
+}
+.ans-col {
+  width: 72px;
+  text-align: center !important;
+  font-weight: 700;
+}
+
+/* Math Box */
+.math-item {
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 15.5px;
+  font-weight: 700;
+}
+.word-prob {
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.work-line {
+  margin-top: 8px;
+  border-bottom: 1.5px dotted #64748b;
+  height: 24px;
+}
+
+/* Reading Box */
+.reading-box {
+  border: 1.5px solid #64748b;
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  margin-bottom: 10px;
+}
+
+/* Chinese Writing Grid (田字格) */
+.hanzi-big {
+  font-size: 21px;
+  font-weight: 700;
+}
+.tian-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.tian-label {
+  width: 115px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.tian-box {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid #334155;
+  position: relative;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  color: #cbd5e1;
+}
+.tian-box.sample {
+  color: #0f172a;
+  background: #f8fafc;
+}
+.tian-box::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed #cbd5e1;
+}
+.tian-box::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed #cbd5e1;
+}
+
+/* Answer Key Page */
+.answer-key {
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 2px dashed #64748b;
+  page-break-before: always;
+}
+.answer-key.hidden-key {
+  display: none;
+}
+.answer-key h2 {
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: #0f172a;
+}
+.key-block {
+  margin-bottom: 10px;
+  font-size: 13.5px;
+}
+.key-block strong { color: #0f172a; }
+
+@media print {
+  body { background: #ffffff; }
+  .toolbar { display: none !important; }
+  .sheet {
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
