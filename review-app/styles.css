@@ -1047,6 +1047,225 @@ h1, h2, h3, h4, .font-display {
   z-index: 80;
 }
 
+/* Main Tab Switcher (Ôn thi HK1 vs Học Big Science 2) */
+.main-tabs-bar {
+  position: relative;
+  z-index: 20;
+  background: rgba(255, 249, 240, 0.92);
+  border-bottom: 2px solid var(--border);
+}
+.main-tabs-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.main-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  padding: 10px 20px;
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.04rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 0 var(--border);
+}
+.main-tab:hover {
+  transform: translateY(-2px);
+  color: var(--text);
+}
+.main-tab.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: #059669;
+  color: #ffffff;
+  box-shadow: 0 4px 0 #047857;
+}
+.main-tab[data-main-tab="review"].active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: #2563eb;
+  box-shadow: 0 4px 0 #1d4ed8;
+}
+
+/* Big Science 2 Learning Tab */
+.bs-hero {
+  background: linear-gradient(135deg, #059669 0%, #10b981 55%, #14b8a6 100%);
+  color: #ffffff;
+  border-radius: 28px;
+  padding: 26px 30px;
+  margin-bottom: 24px;
+  box-shadow: 0 14px 30px rgba(16, 185, 129, 0.22);
+}
+.bs-hero h2 { font-size: 1.9rem; margin-bottom: 6px; }
+.bs-hero p { opacity: 0.95; max-width: 680px; }
+
+.bs-unit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 18px;
+}
+
+.bs-unit-card {
+  background: var(--surface);
+  border: 3px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.bs-unit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+.bs-unit-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.bs-unit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: var(--text-soft);
+}
+.hk1-pill {
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+.bs-unit-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bs-unit-emoji {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  color: white;
+}
+.bs-unit-head h4 { font-size: 1.2rem; line-height: 1.2; }
+.bs-unit-head .bs-sub { font-size: 0.82rem; font-weight: 700; color: var(--text-soft); }
+.bs-bq {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+/* Lesson Cards inside Big Science Unit */
+.lesson-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.lesson-card {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 20px;
+}
+.lesson-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.lesson-vi-sub {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0369a1;
+  margin-bottom: 12px;
+}
+.fact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.fact-row {
+  background: var(--surface);
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fact-en { font-weight: 700; color: var(--text); }
+.fact-vi { font-size: 0.88rem; color: var(--text-soft); margin-top: 3px; }
+.mini-speak {
+  background: #eff6ff;
+  border: 2px solid #bfdbfe;
+  color: #1d4ed8;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.mini-speak:hover { background: #dbeafe; }
+
+.kw-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.kw-chip {
+  background: var(--surface);
+  border: 2px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 8px 14px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.kw-chip:hover {
+  border-color: #10b981;
+  background: #ecfdf5;
+  transform: translateY(-2px);
+}
+.kw-word {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  color: var(--text);
+  display: block;
+}
+.kw-vi {
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
 @media (max-width: 640px) {
   .hide-sm { display: none; }
   .hero-left h2 { font-size: 1.55rem; }

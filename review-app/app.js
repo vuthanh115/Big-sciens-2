@@ -13,10 +13,13 @@
 
   let progress = loadProgress();
   let state = {
-    view: "home", // "home" | "subject" | "exam"
+    mainTab: "review", // "review" | "bigscience"
+    view: "home", // "home" | "subject" | "exam" | "bs-home" | "bs-unit"
     subjectId: null,
     topicId: "all",
     mode: "flashcards", // "flashcards" | "quiz" | "match" | "blanks"
+    bsUnitId: null,
+    bsMode: "lessons", // "lessons" | "flashcards" | "quiz"
     // Flashcard state
     fcIndex: 0,
     fcFlipped: false,
@@ -317,6 +320,12 @@
     viLabelEl.textContent = progress.viHints ? "Gợi ý Việt: BẬT" : "Gợi ý Việt: TẮT";
     btnToggleVi.classList.toggle("active", progress.viHints);
     btnSound.textContent = progress.sound ? "🔊" : "🔇";
+    const tabRev = document.getElementById("tabReview");
+    const tabBs = document.getElementById("tabBigScience");
+    if (tabRev && tabBs) {
+      tabRev.classList.toggle("active", state.mainTab === "review");
+      tabBs.classList.toggle("active", state.mainTab === "bigscience");
+    }
   }
 
   function renderSyllabusModal() {
@@ -332,8 +341,65 @@
 
   // ---------- Navigation Helpers ----------
   function openHome() {
+    state.mainTab = "review";
     state.view = "home";
     state.subjectId = null;
+    render();
+  }
+
+  function openBigScienceHome() {
+    state.mainTab = "bigscience";
+    state.view = "bs-home";
+    state.bsUnitId = null;
+    render();
+  }
+
+  function getBsUnitKeywords(unit) {
+    const list = [];
+    unit.lessons.forEach((l) => {
+      l.keywords.forEach((kw) => list.push({ ...kw, lesson: l.title }));
+    });
+    return list;
+  }
+
+  function getBsUnitQuizzes(unit) {
+    if (unit.reuseSubjectQuiz && window.SUBJECTS && window.SUBJECTS.science) {
+      return window.SUBJECTS.science.quizzes.filter((q) => unit.reuseSubjectQuiz.includes(q.topic));
+    }
+    return unit.quizzes || [];
+  }
+
+  function getBsUnitProgress(unit) {
+    const kws = getBsUnitKeywords(unit);
+    const done = kws.filter((k) => progress.mastered[`bs_${unit.id}:${k.w}`]).length;
+    const cardPct = kws.length ? (done / kws.length) * 55 : 0;
+    const quizPct = ((progress.quizBest[`bs_${unit.id}`] || 0) / 100) * 45;
+    return Math.min(100, Math.round(cardPct + quizPct));
+  }
+
+  function initBsUnitMode(unit) {
+    if (state.bsMode === "flashcards") {
+      state.fcIndex = 0;
+      state.fcFlipped = false;
+    } else if (state.bsMode === "quiz") {
+      state.quizItems = shuffle(getBsUnitQuizzes(unit));
+      state.quizIndex = 0;
+      state.quizScore = 0;
+      state.quizAnswered = false;
+      state.quizSelected = null;
+      state.quizMistakes = [];
+      state.quizFinished = false;
+    }
+  }
+
+  function openBigScienceUnit(unitId, mode = "lessons") {
+    const unit = (window.BIG_SCIENCE_UNITS || []).find((u) => u.id === unitId);
+    if (!unit) return;
+    state.mainTab = "bigscience";
+    state.view = "bs-unit";
+    state.bsUnitId = unitId;
+    state.bsMode = mode;
+    initBsUnitMode(unit);
     render();
   }
 
@@ -414,6 +480,8 @@
     if (state.view === "home") renderHome();
     else if (state.view === "subject") renderSubject();
     else if (state.view === "exam") renderExam();
+    else if (state.view === "bs-home") renderBigScienceHome();
+    else if (state.view === "bs-unit") renderBigScienceUnit();
   }
 
   function renderHome() {
@@ -717,7 +785,9 @@
 
       document.getElementById("btnRetryQuiz").addEventListener("click", () => {
         if (scoreKey === "exam") openExam();
-        else {
+        else if (String(scoreKey).startsWith("bs_")) {
+          openBigScienceUnit(state.bsUnitId, "quiz");
+        } else {
           initMode();
           render();
         }
@@ -729,7 +799,10 @@
           render();
         });
       }
-      document.getElementById("btnBackAfterQuiz").addEventListener("click", openHome);
+      document.getElementById("btnBackAfterQuiz").addEventListener("click", () => {
+        if (String(scoreKey).startsWith("bs_")) openBigScienceHome();
+        else openHome();
+      });
       return;
     }
 
@@ -1052,8 +1125,257 @@
     }
   }
 
+  // ---------- Big Science 2 Full Book Tab ----------
+  function renderBigScienceHome() {
+    const units = window.BIG_SCIENCE_UNITS || [];
+    appEl.innerHTML = `
+      <section class="bs-hero">
+        <div class="hero-badge">📘 PEARSON BIG SCIENCE LEVEL 2 • FULL 9 UNITS</div>
+        <h2>🔬 Học sách Big Science 2 cùng bé!</h2>
+        <p>Trích xuất đầy đủ 9 Unit (26 bài học) từ sách <strong>Big_Science_level_2.pdf</strong>: tóm tắt kiến thức chuẩn sách giáo khoa, chạm từ khóa để nghe phát âm 🔊, Flashcards và Trắc nghiệm cho từng Unit!</p>
+      </section>
+
+      <div class="section-head">
+        <h3>📚 Chọn Unit bé muốn học (Unit 1 – Unit 9)</h3>
+      </div>
+
+      <section class="bs-unit-grid">
+        ${units
+          .map((u) => {
+            const pct = getBsUnitProgress(u);
+            const qCount = getBsUnitQuizzes(u).length;
+            return `
+              <button class="bs-unit-card" data-bs-unit="${u.id}">
+                <div class="bs-unit-top">
+                  <span class="bs-unit-badge">Unit ${u.num} • ${esc(u.domain)}</span>
+                  ${u.hk1 ? `<span class="hk1-pill">⭐ Thi HK1</span>` : ""}
+                </div>
+                <div class="bs-unit-head">
+                  <div class="bs-unit-emoji" style="background:${u.color}">${u.emoji}</div>
+                  <div>
+                    <h4>${esc(u.title)}</h4>
+                    <div class="bs-sub">${progress.viHints ? `${esc(u.viTitle)} • ` : ""}${esc(u.pages)}</div>
+                  </div>
+                </div>
+                <div class="bs-bq">❓ ${esc(u.bigQuestion)}</div>
+                <div class="subject-tags">
+                  <span class="mini-tag">📖 ${u.lessons.length} Lessons</span>
+                  <span class="mini-tag">🔑 ${getBsUnitKeywords(u).length} Key Words</span>
+                  <span class="mini-tag">🎯 ${qCount} Quiz</span>
+                </div>
+                <div class="progress-row">
+                  <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${u.color}"></div></div>
+                  <span class="progress-pct">${pct}%</span>
+                </div>
+              </button>
+            `;
+          })
+          .join("")}
+      </section>
+    `;
+
+    appEl.querySelectorAll("[data-bs-unit]").forEach((btn) => {
+      btn.addEventListener("click", () => openBigScienceUnit(btn.dataset.bsUnit));
+    });
+  }
+
+  function renderBigScienceUnit() {
+    const unit = (window.BIG_SCIENCE_UNITS || []).find((u) => u.id === state.bsUnitId);
+    if (!unit) return openBigScienceHome();
+
+    const modes = [
+      { id: "lessons", label: "📖 Bài học & Từ khóa" },
+      { id: "flashcards", label: "🃏 Flashcards" },
+      { id: "quiz", label: `🎯 Quiz Unit ${unit.num} (${getBsUnitQuizzes(unit).length} câu)` }
+    ];
+
+    appEl.innerHTML = `
+      <div class="back-bar">
+        <button class="btn btn-ghost" id="btnBsBack">⬅️ Danh sách 9 Unit</button>
+        <button class="speak-btn" id="btnSpeakBQ">🔊 Nghe Big Question</button>
+      </div>
+
+      <section class="subject-banner" style="background:linear-gradient(135deg, ${unit.color}, #1e293b)">
+        <div class="banner-info">
+          <div class="banner-emoji">${unit.emoji}</div>
+          <div>
+            <h2>Unit ${unit.num}: ${esc(unit.title)}</h2>
+            <p><strong>Big Question:</strong> ${esc(unit.bigQuestion)} ${progress.viHints ? `(${esc(unit.viBigQuestion)})` : ""}</p>
+          </div>
+        </div>
+        <div class="star-badge" style="box-shadow:none">📊 ${getBsUnitProgress(unit)}%</div>
+      </section>
+
+      <div class="mode-tabs">
+        ${modes
+          .map((m) => `<button class="mode-tab ${state.bsMode === m.id ? "active" : ""}" data-bs-mode="${m.id}">${m.label}</button>`)
+          .join("")}
+      </div>
+
+      <div class="panel" id="bsPanel"></div>
+    `;
+
+    document.getElementById("btnBsBack").addEventListener("click", openBigScienceHome);
+    document.getElementById("btnSpeakBQ").addEventListener("click", () => speakText(unit.bigQuestion, "en-US"));
+
+    appEl.querySelectorAll("[data-bs-mode]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.bsMode = btn.dataset.bsMode;
+        initBsUnitMode(unit);
+        render();
+      });
+    });
+
+    const panel = document.getElementById("bsPanel");
+    if (state.bsMode === "lessons") renderBsLessons(panel, unit);
+    else if (state.bsMode === "flashcards") renderBsFlashcards(panel, unit);
+    else if (state.bsMode === "quiz") renderQuiz(panel, `bs_${unit.id}`, "en-US");
+  }
+
+  function renderBsLessons(panel, unit) {
+    panel.innerHTML = `
+      <div class="lesson-list">
+        ${unit.lessons
+          .map(
+            (lesson, li) => `
+          <article class="lesson-card">
+            <h3>📘 ${esc(lesson.title)}</h3>
+            ${progress.viHints ? `<div class="lesson-vi-sub">🇻🇳 ${esc(lesson.viTitle)}</div>` : ""}
+            <div class="fact-list">
+              ${lesson.facts
+                .map(
+                  (f, fi) => `
+                <div class="fact-row">
+                  <div>
+                    <div class="fact-en">• ${esc(f.en)}</div>
+                    ${progress.viHints ? `<div class="fact-vi">${esc(f.vi)}</div>` : ""}
+                  </div>
+                  <button class="mini-speak" data-speak-fact="${li}-${fi}" title="Nghe đọc tiếng Anh">🔊</button>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+            <div style="font-weight:800;font-size:0.9rem;margin-bottom:8px;color:var(--text-soft)">🔑 Key Words (chạm vào từ để nghe phát âm 🔊):</div>
+            <div class="kw-grid">
+              ${lesson.keywords
+                .map(
+                  (kw) => `
+                <button class="kw-chip" data-speak-kw="${esc(kw.w)}" title="${esc(kw.ex)}">
+                  <span class="kw-word">🔊 ${esc(kw.w)}</span>
+                  ${progress.viHints ? `<span class="kw-vi">${esc(kw.vi)}</span>` : ""}
+                </button>
+              `
+                )
+                .join("")}
+            </div>
+          </article>
+        `
+          )
+          .join("")}
+      </div>
+    `;
+
+    panel.querySelectorAll("[data-speak-fact]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const [li, fi] = btn.dataset.speakFact.split("-").map(Number);
+        speakText(unit.lessons[li].facts[fi].en, "en-US");
+      });
+    });
+
+    panel.querySelectorAll("[data-speak-kw]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        playTone("flip");
+        speakText(btn.dataset.speakKw, "en-US");
+      });
+    });
+  }
+
+  function renderBsFlashcards(panel, unit) {
+    const cards = getBsUnitKeywords(unit);
+    if (!cards.length) {
+      panel.innerHTML = `<p>Chưa có thẻ từ vựng cho Unit này.</p>`;
+      return;
+    }
+    if (state.fcIndex >= cards.length) state.fcIndex = 0;
+    const card = cards[state.fcIndex];
+    const key = `bs_${unit.id}:${card.w}`;
+    const isMastered = !!progress.mastered[key];
+
+    panel.innerHTML = `
+      <div class="flashcard-stage">
+        <div class="flashcard-wrap">
+          <div class="flashcard ${state.fcFlipped ? "flipped" : ""}" id="bsFlashcard">
+            <div class="card-face card-front">
+              <span class="fc-topic">Unit ${unit.num} • Card ${state.fcIndex + 1}/${cards.length}</span>
+              <div class="fc-emoji">${unit.emoji}</div>
+              <div class="fc-word">${esc(card.w)}</div>
+              <button class="speak-btn" id="btnBsSpeakFront">🔊 Nghe phát âm</button>
+              <div class="fc-tip">👆 Chạm vào thẻ để lật xem nghĩa & ví dụ</div>
+            </div>
+            <div class="card-face card-back">
+              <span class="fc-topic">${esc(card.lesson)}</span>
+              <div class="fc-meaning">${esc(card.vi)}</div>
+              <div class="fc-example">${esc(card.ex)}</div>
+              <button class="speak-btn" id="btnBsSpeakBack">🔊 Đọc câu ví dụ</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="fc-controls">
+          <button class="btn btn-ghost" id="btnBsPrev">⬅️ Trước</button>
+          <span class="fc-counter">${state.fcIndex + 1} / ${cards.length}</span>
+          <button class="btn btn-ghost" id="btnBsNext">Tiếp ➡️</button>
+          <button class="btn ${isMastered ? "btn-success" : "btn-warn"}" id="btnBsMaster">
+            ${isMastered ? "✅ Bé đã thuộc!" : "⭐ Đánh dấu đã thuộc"}
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("bsFlashcard").addEventListener("click", (e) => {
+      if (e.target.closest("button")) return;
+      state.fcFlipped = !state.fcFlipped;
+      playTone("flip");
+      renderBsFlashcards(panel, unit);
+    });
+    document.getElementById("btnBsSpeakFront").addEventListener("click", (e) => {
+      e.stopPropagation();
+      speakText(card.w, "en-US");
+    });
+    document.getElementById("btnBsSpeakBack").addEventListener("click", (e) => {
+      e.stopPropagation();
+      speakText(card.ex, "en-US");
+    });
+    document.getElementById("btnBsPrev").addEventListener("click", () => {
+      state.fcIndex = (state.fcIndex - 1 + cards.length) % cards.length;
+      state.fcFlipped = false;
+      renderBsFlashcards(panel, unit);
+    });
+    document.getElementById("btnBsNext").addEventListener("click", () => {
+      state.fcIndex = (state.fcIndex + 1) % cards.length;
+      state.fcFlipped = false;
+      renderBsFlashcards(panel, unit);
+    });
+    document.getElementById("btnBsMaster").addEventListener("click", () => {
+      if (!progress.mastered[key]) {
+        progress.mastered[key] = true;
+        addStars(2);
+        playTone("ok");
+      } else {
+        delete progress.mastered[key];
+        saveProgress();
+      }
+      render();
+    });
+  }
+
   // ---------- Global Event Wiring ----------
   btnHome.addEventListener("click", openHome);
+  const tabReviewBtn = document.getElementById("tabReview");
+  const tabBsBtn = document.getElementById("tabBigScience");
+  if (tabReviewBtn) tabReviewBtn.addEventListener("click", openHome);
+  if (tabBsBtn) tabBsBtn.addEventListener("click", openBigScienceHome);
   btnToggleVi.addEventListener("click", () => {
     progress.viHints = !progress.viHints;
     saveProgress();

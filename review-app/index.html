@@ -44,6 +44,17 @@
     </div>
   </header>
 
+  <nav class="main-tabs-bar" aria-label="Main sections">
+    <div class="main-tabs-inner">
+      <button class="main-tab active" id="tabReview" data-main-tab="review">
+        <span>📋</span> Ôn thi HK1 (5 môn)
+      </button>
+      <button class="main-tab" id="tabBigScience" data-main-tab="bigscience">
+        <span>🔬</span> Học Big Science 2 (9 Units)
+      </button>
+    </div>
+  </nav>
+
   <main id="app" class="app-container">
     <!-- Dynamic views rendered by app.js -->
   </main>
@@ -63,6 +74,7 @@
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>
 
   <script src="data.js"></script>
+  <script src="big-science-data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
