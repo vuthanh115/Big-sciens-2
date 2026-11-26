@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Starters 2 — Final Term 1 Review Adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-decor" aria-hidden="true">
+    <span class="float-shape s1">⭐</span>
+    <span class="float-shape s2">☁️</span>
+    <span class="float-shape s3">🎈</span>
+    <span class="float-shape s4">✨</span>
+    <span class="float-shape s5">🌈</span>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="brand" id="btnHome" title="Back to Home">
+        <span class="brand-logo">🦉</span>
+        <div class="brand-text">
+          <h1>Starters 2 Adventure</h1>
+          <p>Final Term 1 Review • 2026–2027</p>
+        </div>
+      </button>
+
+      <div class="topbar-actions">
+        <button class="pill-btn" id="btnToggleVi" title="Bật/tắt gợi ý Tiếng Việt">
+          <span>🇻🇳</span> <span id="viLabel">Gợi ý Việt: BẬT</span>
+        </button>
+        <button class="pill-btn icon-only" id="btnSound" title="Bật/tắt âm thanh">🔊</button>
+        <button class="pill-btn" id="btnSyllabus" title="Xem đề cương & số trang sách">
+          📋 <span class="hide-sm">Đề cương</span>
+        </button>
+        <div class="star-badge" id="starCounter" title="Số sao bé đạt được">
+          <span class="star-icon">⭐</span>
+          <span id="totalStars">0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" class="app-container">
+    <!-- Dynamic views rendered by app.js -->
+  </main>
+
+  <!-- Syllabus Reference Modal -->
+  <div class="modal-backdrop hidden" id="syllabusModal" role="dialog" aria-modal="true" aria-labelledby="syllabusTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="syllabusTitle">📋 Đề cương ôn thi HK1 — Starters 2</h2>
+        <button class="close-btn" id="btnCloseSyllabus" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="syllabusContent"></div>
+    </div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
