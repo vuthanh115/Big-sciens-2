@@ -322,9 +322,11 @@
     btnSound.textContent = progress.sound ? "🔊" : "🔇";
     const tabRev = document.getElementById("tabReview");
     const tabBs = document.getElementById("tabBigScience");
+    const tabSoc = document.getElementById("tabSocial");
     if (tabRev && tabBs) {
       tabRev.classList.toggle("active", state.mainTab === "review");
       tabBs.classList.toggle("active", state.mainTab === "bigscience");
+      if (tabSoc) tabSoc.classList.toggle("active", state.mainTab === "social");
     }
   }
 
@@ -352,6 +354,19 @@
     state.view = "bs-home";
     state.bsUnitId = null;
     render();
+  }
+
+  function openSocialBookHome() {
+    state.mainTab = "social";
+    state.view = "bs-home";
+    state.bsUnitId = null;
+    render();
+  }
+
+  function getActiveBookUnits() {
+    return state.mainTab === "social"
+      ? (window.SOCIAL_STUDIES_UNITS || [])
+      : (window.BIG_SCIENCE_UNITS || []);
   }
 
   function getBsUnitKeywords(unit) {
@@ -393,9 +408,8 @@
   }
 
   function openBigScienceUnit(unitId, mode = "lessons") {
-    const unit = (window.BIG_SCIENCE_UNITS || []).find((u) => u.id === unitId);
+    const unit = getActiveBookUnits().find((u) => u.id === unitId);
     if (!unit) return;
-    state.mainTab = "bigscience";
     state.view = "bs-unit";
     state.bsUnitId = unitId;
     state.bsMode = mode;
@@ -800,8 +814,10 @@
         });
       }
       document.getElementById("btnBackAfterQuiz").addEventListener("click", () => {
-        if (String(scoreKey).startsWith("bs_")) openBigScienceHome();
-        else openHome();
+        if (String(scoreKey).startsWith("bs_")) {
+          if (state.mainTab === "social") openSocialBookHome();
+          else openBigScienceHome();
+        } else openHome();
       });
       return;
     }
@@ -1125,18 +1141,23 @@
     }
   }
 
-  // ---------- Big Science 2 Full Book Tab ----------
+  // ---------- Big Science 2 & Social Studies Book Tabs ----------
   function renderBigScienceHome() {
-    const units = window.BIG_SCIENCE_UNITS || [];
+    const isSocial = state.mainTab === "social";
+    const units = getActiveBookUnits();
     appEl.innerHTML = `
-      <section class="bs-hero">
-        <div class="hero-badge">📘 PEARSON BIG SCIENCE LEVEL 2 • FULL 9 UNITS</div>
-        <h2>🔬 Học sách Big Science 2 cùng bé!</h2>
-        <p>Trích xuất đầy đủ 9 Unit (26 bài học) từ sách <strong>Big_Science_level_2.pdf</strong>: tóm tắt kiến thức chuẩn sách giáo khoa, chạm từ khóa để nghe phát âm 🔊, Flashcards và Trắc nghiệm cho từng Unit!</p>
+      <section class="bs-hero ${isSocial ? "social-hero" : ""}">
+        <div class="hero-badge">${isSocial ? "🌍 WORLD WINDOWS (NATIONAL GEOGRAPHIC) • SOCIAL STUDIES GRADE 2" : "📘 PEARSON BIG SCIENCE LEVEL 2 • FULL 9 UNITS"}</div>
+        <h2>${isSocial ? "🏙️ Học Social Studies — The City & The Country!" : "🔬 Học sách Big Science 2 cùng bé!"}</h2>
+        <p>${
+          isSocial
+            ? "Bài học tương tác chuẩn cuốn <strong>World Windows: The City and the Country (trang 6–14)</strong> cùng 2 chủ đề <strong>Neighborhood</strong> và <strong>Raw Materials & Products</strong> — có nghe đọc tiếng Anh 🔊, Flashcards và Trắc nghiệm!"
+            : "Trích xuất đầy đủ 9 Unit (26 bài học) từ sách <strong>Big_Science_level_2.pdf</strong>: tóm tắt kiến thức chuẩn sách giáo khoa, chạm từ khóa để nghe phát âm 🔊, Flashcards và Trắc nghiệm cho từng Unit!"
+        }</p>
       </section>
 
       <div class="section-head">
-        <h3>📚 Chọn Unit bé muốn học (Unit 1 – Unit 9)</h3>
+        <h3>${isSocial ? "📚 Chọn chủ đề Social Studies (3 Units)" : "📚 Chọn Unit bé muốn học (Unit 1 – Unit 9)"}</h3>
       </div>
 
       <section class="bs-unit-grid">
@@ -1180,8 +1201,9 @@
   }
 
   function renderBigScienceUnit() {
-    const unit = (window.BIG_SCIENCE_UNITS || []).find((u) => u.id === state.bsUnitId);
-    if (!unit) return openBigScienceHome();
+    const isSocial = state.mainTab === "social";
+    const unit = getActiveBookUnits().find((u) => u.id === state.bsUnitId);
+    if (!unit) return isSocial ? openSocialBookHome() : openBigScienceHome();
 
     const modes = [
       { id: "lessons", label: "📖 Bài học & Từ khóa" },
@@ -1191,7 +1213,7 @@
 
     appEl.innerHTML = `
       <div class="back-bar">
-        <button class="btn btn-ghost" id="btnBsBack">⬅️ Danh sách 9 Unit</button>
+        <button class="btn btn-ghost" id="btnBsBack">⬅️ ${isSocial ? "Danh sách Social Studies" : "Danh sách 9 Unit"}</button>
         <button class="speak-btn" id="btnSpeakBQ">🔊 Nghe Big Question</button>
       </div>
 
@@ -1215,7 +1237,10 @@
       <div class="panel" id="bsPanel"></div>
     `;
 
-    document.getElementById("btnBsBack").addEventListener("click", openBigScienceHome);
+    document.getElementById("btnBsBack").addEventListener("click", () => {
+      if (isSocial) openSocialBookHome();
+      else openBigScienceHome();
+    });
     document.getElementById("btnSpeakBQ").addEventListener("click", () => speakText(unit.bigQuestion, "en-US"));
 
     appEl.querySelectorAll("[data-bs-mode]").forEach((btn) => {
@@ -1374,8 +1399,10 @@
   btnHome.addEventListener("click", openHome);
   const tabReviewBtn = document.getElementById("tabReview");
   const tabBsBtn = document.getElementById("tabBigScience");
+  const tabSocBtn = document.getElementById("tabSocial");
   if (tabReviewBtn) tabReviewBtn.addEventListener("click", openHome);
   if (tabBsBtn) tabBsBtn.addEventListener("click", openBigScienceHome);
+  if (tabSocBtn) tabSocBtn.addEventListener("click", openSocialBookHome);
   btnToggleVi.addEventListener("click", () => {
     progress.viHints = !progress.viHints;
     saveProgress();

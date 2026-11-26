@@ -1093,6 +1093,15 @@ h1, h2, h3, h4, .font-display {
   border-color: #2563eb;
   box-shadow: 0 4px 0 #1d4ed8;
 }
+.main-tab[data-main-tab="social"].active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-color: #d97706;
+  box-shadow: 0 4px 0 #b45309;
+}
+.bs-hero.social-hero {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 55%, #fbbf24 100%);
+  box-shadow: 0 14px 30px rgba(245, 158, 11, 0.25);
+}
 
 /* Big Science 2 Learning Tab */
 .bs-hero {
